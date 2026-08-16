@@ -96,6 +96,19 @@ function sanitizedResponseHeaders(response) {
   return headers;
 }
 
+async function isMcpJsonRpcRequest(request) {
+  try {
+    const value = await request.clone().json();
+    const messages = Array.isArray(value) ? value : [value];
+    return messages.length > 0 && messages.every((message) =>
+      message && typeof message === "object" && message.jsonrpc === "2.0" &&
+      (typeof message.method === "string" || Object.hasOwn(message, "result") || Object.hasOwn(message, "error"))
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default {
   async fetch(request, env) {
     const incoming = new URL(request.url);
@@ -127,6 +140,9 @@ export default {
     const declaredLength = Number(request.headers.get("content-length") || 0);
     if (Number.isFinite(declaredLength) && declaredLength > MAX_DECLARED_BODY_BYTES) {
       return plainText("payload too large", 413);
+    }
+    if (request.method === "POST" && !await isMcpJsonRpcRequest(request)) {
+      return json({ok: false, error: "invalid MCP JSON-RPC request"}, 400);
     }
 
     const upstream = validatedUpstream(env.UPSTREAM_MCP);
