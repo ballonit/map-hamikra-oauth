@@ -1,0 +1,184 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "מפת המקרא",
+    "subtitle": "חיפוש והשוואת עדי נוסח",
+    "description": "מפת המקרא היא כלי מחקר וחינוך לקריאה, חיפוש והשוואה של טקסטים מקראיים. היא מספקת טקסט וטוקנים של MT/WLC, חיפוש לקסיקלי ומורפולוגי, חיפוש ביטויים ומבני טוקנים, בדיקת זמינות והשוואה של עדי נוסח ותרגומים, ו-provenance מפורט תוך הפרדה בין מקורות וללא הסקת Vorlage אוטומטית.",
+    "category": "EDUCATION"
+  },
+  "tools": {
+    "verse_text": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Retrieves MT/WLC verse text and optional OSHB token data without modifying stored state.",
+        "open_world_justification": "Reads the private corpus database and does not publish or change external internet state.",
+        "destructive_justification": "Does not delete, overwrite, revoke, or irreversibly modify any data."
+      }
+    },
+    "lexical_search": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Searches indexed OSHB lemma and surface fields and returns matching corpus records only.",
+        "open_world_justification": "Does not send messages, publish content, or change third-party systems.",
+        "destructive_justification": "Performs no delete, overwrite, or irreversible operation."
+      }
+    },
+    "morphology_search": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Filters existing OSHB token records by deterministic morphology fields without changing them.",
+        "open_world_justification": "Operates only on the corpus database and does not affect public or third-party state.",
+        "destructive_justification": "Cannot delete or alter corpus records."
+      }
+    },
+    "phrase_search": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Finds adjacent normalized Hebrew surface sequences in the loaded corpus and returns matches.",
+        "open_world_justification": "Reads local corpus data only and does not write to external systems.",
+        "destructive_justification": "Does not modify or remove data."
+      }
+    },
+    "token_sequence_search": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Runs a bounded deterministic token-sequence query over indexed corpus tokens and returns paginated matches.",
+        "open_world_justification": "The search is confined to the loaded database and has no external side effects.",
+        "destructive_justification": "The query cannot update, delete, or overwrite corpus data."
+      }
+    },
+    "token_analysis": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Retrieves one stored OSHB token and its verse context by stable token identifier.",
+        "open_world_justification": "Does not contact or modify third-party systems.",
+        "destructive_justification": "Does not mutate any stored record."
+      }
+    },
+    "compare_witnesses": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Reads publication-cleared witness records separately and computes a conservative comparison without storing changes.",
+        "open_world_justification": "Returns data from loaded sources and does not publish or modify external content.",
+        "destructive_justification": "Cannot delete, overwrite, or change witness records."
+      }
+    },
+    "get_witness_passage": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Retrieves a requested publication-cleared witness passage and provenance without changing source data.",
+        "open_world_justification": "Reads the loaded witness database only and makes no public or third-party changes.",
+        "destructive_justification": "Performs no irreversible action."
+      }
+    },
+    "witness_availability": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Checks loaded coverage and publication status without returning or modifying restricted source text.",
+        "open_world_justification": "Does not write to or alter any external service.",
+        "destructive_justification": "Cannot delete or overwrite any source or coverage data."
+      }
+    },
+    "resolve_reference": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Reads verified versification profiles and edition records to resolve reference candidates without changing them.",
+        "open_world_justification": "All resolution operates on loaded database records and has no external side effects.",
+        "destructive_justification": "Does not modify versification rules or source texts."
+      }
+    },
+    "dataset_capabilities": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Returns corpus coverage, source inventory, licenses, capabilities, and explicit limitations from stored metadata.",
+        "open_world_justification": "Only inspects the service's own metadata and does not alter external state.",
+        "destructive_justification": "Does not change or remove any data."
+      }
+    },
+    "search": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Searches references, lemmas, surfaces, or Hebrew phrases and returns stable fetch identifiers.",
+        "open_world_justification": "Search is limited to the loaded corpus and does not affect third-party systems.",
+        "destructive_justification": "Performs no modification or deletion."
+      }
+    },
+    "fetch": {
+      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "justifications": {
+        "read_only_justification": "Fetches a corpus record identified by a stable search result, token, or witness identifier.",
+        "open_world_justification": "Reads stored corpus data and does not publish or change external state.",
+        "destructive_justification": "Does not mutate or remove data."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Retrieve a Hebrew Bible verse with source provenance.",
+      "user_prompt": "הציגי את דברים לב 8 בנוסח MT/WLC וצייני את מקור הטקסט.",
+      "file_attachment_urls": null,
+      "tools_triggered": "verse_text",
+      "expected_output": "Returns Deuteronomy 32:8 from MT/WLC with the requested reading and provenance for OSHB/WLC.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Search an exact Hebrew surface across the corpus.",
+      "user_prompt": "מצאי את המופעים של המילה עליון במקרא.",
+      "file_attachment_urls": null,
+      "tools_triggered": "lexical_search",
+      "expected_output": "Returns paginated exact-surface matches with references and token context, without treating the surface as a root.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Run a deterministic adjacent token construction search.",
+      "user_prompt": "מצאי צירופים צמודים שבהם בן/בני הוא H1121 ואחריו אלהים H430 או אל H410, בכל הקריאות.",
+      "file_attachment_urls": null,
+      "tools_triggered": "token_sequence_search",
+      "expected_output": "Returns exhaustive adjacent same-verse matches with normalized query, matched tokens, readings, references, and pagination metadata.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Compare publication-cleared witnesses without merging them.",
+      "user_prompt": "השווי את דברים לב 8 בין MT, LXX ו-Vulgate ושמרי כל עד בנפרד.",
+      "file_attachment_urls": null,
+      "tools_triggered": "compare_witnesses",
+      "expected_output": "Returns the three witnesses separately with source editions, provenance, mapping status, and a conservative comparison that does not infer a Hebrew Vorlage automatically.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Retrieve a named Targum passage as a separate witness.",
+      "user_prompt": "הציגי את אונקלוס לבראשית ג 20 עם מקור ומהדורה.",
+      "file_attachment_urls": null,
+      "tools_triggered": "get_witness_passage",
+      "expected_output": "Returns the named Onkelos witness when available, with source-native text, coverage status, edition information, and provenance without merging other Targums.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not invoke the biblical corpus for an unrelated weather request.",
+      "user_prompt": "מה מזג האוויר מחר בתל אביב?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The plugin should not be invoked because weather is outside the biblical research workflow.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not invoke the plugin to send external communications.",
+      "user_prompt": "שלחי מייל למרצה שלי ותכתבי שאאחר לשיעור.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The plugin should not be invoked because it has no email or messaging capability.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not claim the public corpus plugin can mutate the research source of truth.",
+      "user_prompt": "עדכני את Google Sheet של המחקר ושני את הסטטוס של Q06 לסגור.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The public Map HaMikra plugin should not be invoked for a write because all of its exposed tools are read-only and it has no Google Sheets mutation tool.",
+      "expected_output_url": null
+    }
+  ]
+}
