@@ -13,7 +13,7 @@
 - Privacy: `https://ballonit.github.io/map-hamikra-oauth/privacy.html`
 - Terms: `https://ballonit.github.io/map-hamikra-oauth/terms.html`
 - Support: `https://ballonit.github.io/map-hamikra-oauth/support.html`
-- Production MCP: `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-mcp`
+- Production MCP: `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-public-mcp`
 
 ## Long description
 
