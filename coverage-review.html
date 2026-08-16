@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>מפת המקרא — אישור Coverage</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#17212b;background:#f6f4ef;color-scheme:light}
+    *{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}
+    header{position:sticky;top:0;z-index:5;background:#fffdfa;border-bottom:1px solid #ddd7cd;padding:14px 18px}
+    .wrap{width:min(1180px,100%);margin:auto}.top,.stats,.controls,.bottom{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+    h1{font-size:1.25rem;margin:0}.pill{border:1px solid #d9d4cb;border-radius:999px;padding:5px 9px;background:#fff;font-size:.8rem}
+    .stats{margin-top:10px}.muted{color:#68727c}.error{color:#9b1c1c;font-weight:750}.success{color:#176a37;font-weight:750}
+    main{padding:18px}.intro{background:#fffdfa;border:1px solid #ded8cf;border-radius:14px;padding:14px;margin-bottom:14px}
+    .controls{margin-bottom:14px}.controls input,.controls select,button,.field{border:1px solid #c9cdd2;border-radius:9px;padding:9px 11px;background:#fff}
+    .controls input{min-width:240px;flex:1}button{cursor:pointer;font-weight:700}button:disabled{opacity:.5;cursor:wait}.primary{background:#17212b;color:#fff;border-color:#17212b}
+    .login{max-width:520px;margin:70px auto;background:#fffdfa;border:1px solid #ddd7cd;border-radius:18px;padding:26px}.login label{display:block;font-weight:700;margin:14px 0 6px}.login input{width:100%}
+    .card{background:#fff;border:1px solid #dfddd8;border-radius:13px;margin:8px 0;padding:12px;display:grid;grid-template-columns:28px 105px minmax(260px,1fr) 150px 190px;gap:10px;align-items:start}
+    .card.include{border-right:5px solid #2f7b49}.card.exclude{border-right:5px solid #a63c3c}.card.unresolved{border-right:5px solid #a9781c}.card.certified{opacity:.58}
+    .ref{direction:ltr;text-align:left;font-weight:800}.ctx{font-family:"Noto Serif Hebrew","Times New Roman",serif;font-size:1.05rem;line-height:1.62}.why{font-size:.78rem;color:#66717c;margin-top:5px}.surface{font-size:.8rem;color:#58636e;direction:rtl}
+    .decision{display:flex;flex-direction:column;gap:6px}.decision select,.decision input{width:100%;border:1px solid #d4d7db;border-radius:8px;padding:7px;background:#fff}.decision input{font-size:.8rem}
+    .sticky{position:sticky;bottom:0;z-index:4;background:rgba(246,244,239,.97);border-top:1px solid #d8d4cc;padding:12px 18px}.sticky .wrap{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .confirm{font-weight:650}.status{font-size:.85rem}.hidden{display:none!important}
+    @media(max-width:850px){.card{grid-template-columns:28px 90px 1fr}.surface{display:none}.decision{grid-column:2/4}.controls input{min-width:160px}}
+  </style>
+</head>
+<body>
+  <section id="login" class="login hidden">
+    <h1>כניסה לאישור Q01</h1>
+    <p class="muted">העמוד משתמש באותה כניסת Supabase של כלי מפת המקרא. רק חשבון ה־owner יכול לאשר.</p>
+    <form id="loginForm">
+      <label for="email">אימייל</label><input class="field" id="email" type="email" autocomplete="username" required>
+      <label for="password">סיסמה</label><input class="field" id="password" type="password" autocomplete="current-password" minlength="8" required>
+      <button class="primary" id="loginButton" type="submit" style="margin-top:16px">כניסה</button>
+    </form>
+    <p id="loginMessage" class="error"></p>
+  </section>
+
+  <div id="app" class="hidden">
+    <header><div class="wrap">
+      <div class="top"><h1>Q01 · אישור Coverage אנושי</h1><span class="pill" id="manifestPill">טוענת…</span><span class="pill">102 יחידות סקירה</span></div>
+      <div class="stats"><span class="pill" id="includeCount">Include 0</span><span class="pill" id="excludeCount">Exclude 0</span><span class="pill" id="unresolvedCount">Unresolved 0</span><span class="pill" id="certifiedCount">מאושרים 0</span></div>
+    </div></header>
+    <main class="wrap">
+      <div class="intro"><strong>מה את מאשרת כאן?</strong> הסיווג של כל מועמד שהסריקה התחבירית מצאה: האם הוא באמת שייך לקורפוס “אלהים כדובר”. ההצעות כבר מוכנות, אבל הן אינן הופכות ל־<code>human_confirmed</code> עד שאת לוחצת אישור.</div>
+      <div class="controls">
+        <input id="search" placeholder="חיפוש פסוק או טקסט">
+        <select id="filter"><option value="all">הכול</option><option value="include">Include</option><option value="exclude">Exclude</option><option value="unresolved">Unresolved</option><option value="certified">כבר מאושר</option></select>
+        <button id="selectVisible" type="button">סמני מוצגים</button><button id="clearVisible" type="button">בטלי מוצגים</button>
+      </div>
+      <div id="rows"></div>
+    </main>
+    <div class="sticky"><div class="wrap bottom">
+      <label class="confirm"><input type="checkbox" id="humanConfirm"> עברתי על הסיווגים ואני מאשרת שהפעולה הבאה היא אישור אנושי מחייב.</label>
+      <div><span id="status" class="status muted"></span> <button class="primary" id="approve" type="button">אשרי את כל המסומנים</button></div>
+    </div></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2.82.0";
+    const SUPABASE_URL="https://aaszxmakdzorbpkttlon.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY="sb_publishable_HaOwaXTpBkBvjGzIlnRuCQ_OTkn_U7f";
+    const OWNER_USER_ID="45c56d0b-6d1c-45d7-bba0-f197e6003961";
+    const BACKEND=`${SUPABASE_URL}/functions/v1/map-hamikra-oauth-authorize`;
+    const supabase=createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    const $=s=>document.querySelector(s);let payload=null,rows=[];
+    const reasonChoices={
+      include:[["target_match","target match"]],
+      exclude:[["wrong_construction","wrong construction"],["wrong_referent","wrong referent"],["outside_defined_scope","outside scope"],["secondary_quotation_occurrence","secondary quotation"],["duplicate_dataset_record","duplicate"],["other","other"]],
+      unresolved:[["ambiguous_lemma","ambiguous lemma"],["ambiguous_syntax","ambiguous syntax"],["missing_context","missing context"],["dataset_conflict","dataset conflict"],["witness_gap","witness gap"],["other","other"]]
+    };
+    function text(el,value){el.textContent=value==null?"":String(value)}
+    function node(tag,cls){const n=document.createElement(tag);if(cls)n.className=cls;return n}
+    function showLogin(message=""){$("#app").classList.add("hidden");$("#login").classList.remove("hidden");text($("#loginMessage"),message)}
+    async function session(){const {data,error}=await supabase.auth.getSession();if(error||!data.session)return null;const {data:userData,error:userError}=await supabase.auth.getUser();if(userError||!userData.user)return null;if(userData.user.id!==OWNER_USER_ID){await supabase.auth.signOut({scope:"local"});throw new Error("החשבון המחובר אינו מורשה לפרויקט הזה.")}return data.session}
+    async function api(path,body){const s=await session();if(!s)throw new Error("AUTH_REQUIRED");const response=await fetch(`${BACKEND}${path}`,{method:"POST",headers:{"content-type":"application/json","authorization":`Bearer ${s.access_token}`},body:JSON.stringify(body||{})});let data=null;try{data=await response.json()}catch{}if(!response.ok){const e=new Error(data?.error||`HTTP ${response.status}`);e.status=response.status;throw e}return data}
+    function fillReasons(select,decision,current){select.replaceChildren();for(const [value,label] of reasonChoices[decision]){const o=document.createElement("option");o.value=value;o.textContent=label;select.append(o)}if(reasonChoices[decision].some(([v])=>v===current))select.value=current}
+    function render(){const box=$("#rows");box.replaceChildren();const query=$("#search").value.trim().toLowerCase(),filter=$("#filter").value;let inc=0,exc=0,unr=0,cert=0;
+      for(const r of rows){if(r.uiDecision==="include")inc++;else if(r.uiDecision==="exclude")exc++;else unr++;if(r.certified_decision)cert++;const visible=(!query||(r.reference+" "+r.context).toLowerCase().includes(query))&&(filter==="all"||(filter==="certified"?!!r.certified_decision:r.uiDecision===filter));if(!visible)continue;
+        const card=node("div",`card ${r.uiDecision}${r.certified_decision?" certified":""}`);card.dataset.id=r.candidate_id;
+        const pick=document.createElement("input");pick.type="checkbox";pick.className="pick";pick.checked=!r.certified_decision;pick.disabled=!!r.certified_decision;card.append(pick);
+        const ref=node("div","ref");text(ref,`${r.reference} · ${r.pass_id}`);card.append(ref);
+        const center=node("div");const ctx=node("div","ctx");text(ctx,r.context);const why=node("div","why");text(why,`הצעה: ${r.suggestion.why} · ${r.project_mapping_status}`);center.append(ctx,why);card.append(center);
+        const surface=node("div","surface");text(surface,r.surface);card.append(surface);
+        const decision=node("div","decision");const ds=document.createElement("select");for(const v of ["include","exclude","unresolved"]){const o=document.createElement("option");o.value=v;o.textContent=v;ds.append(o)}ds.value=r.uiDecision;
+        const rs=document.createElement("select");fillReasons(rs,r.uiDecision,r.uiReason);
+        const note=document.createElement("input");note.placeholder="הערה";note.value=r.uiNote;
+        ds.addEventListener("change",()=>{r.uiDecision=ds.value;r.uiReason=reasonChoices[r.uiDecision][0][0];r.uiNote=r.uiDecision==="include"?"":(r.uiNote||"אושר אנושית לאחר בדיקת ההקשר.");render()});rs.addEventListener("change",()=>r.uiReason=rs.value);note.addEventListener("input",()=>r.uiNote=note.value);
+        decision.append(ds,rs,note);card.append(decision);box.append(card)}
+      text($("#includeCount"),`Include ${inc}`);text($("#excludeCount"),`Exclude ${exc}`);text($("#unresolvedCount"),`Unresolved ${unr}`);text($("#certifiedCount"),`מאושרים ${cert}`)
+    }
+    async function load(){try{const s=await session();if(!s){showLogin();return}$("#login").classList.add("hidden");$("#app").classList.remove("hidden");payload=await api("/api/coverage/data",{});rows=payload.rows.map(r=>({...r,uiDecision:r.suggestion.decision,uiReason:r.suggestion.reason_code,uiNote:r.suggestion.note||""}));text($("#manifestPill"),`manifest r${payload.manifest.manifest_revision}`);render()}catch(error){if(error.message==="AUTH_REQUIRED"){showLogin();return}showLogin(error.message)}}
+    $("#loginForm").addEventListener("submit",async event=>{event.preventDefault();const button=$("#loginButton");button.disabled=true;text($("#loginMessage"),"");try{const {data,error}=await supabase.auth.signInWithPassword({email:$("#email").value.trim(),password:$("#password").value});if(error||!data.session)throw new Error("פרטי הכניסה אינם תקינים.");const s=await session();if(!s)throw new Error("הכניסה נכשלה.");await load()}catch(error){text($("#loginMessage"),error.message)}finally{button.disabled=false}});
+    $("#search").addEventListener("input",render);$("#filter").addEventListener("change",render);
+    $("#selectVisible").addEventListener("click",()=>document.querySelectorAll(".card .pick:not(:disabled)").forEach(x=>x.checked=true));$("#clearVisible").addEventListener("click",()=>document.querySelectorAll(".card .pick:not(:disabled)").forEach(x=>x.checked=false));
+    $("#approve").addEventListener("click",async()=>{const status=$("#status");if(!$("#humanConfirm").checked){status.className="status error";text(status,"צריך לסמן את אישור האדם קודם.");return}const ids=[...document.querySelectorAll(".card .pick:checked")].map(x=>x.closest(".card").dataset.id);if(!ids.length){status.className="status error";text(status,"אין מועמדים מסומנים.");return}const decisions=rows.filter(r=>ids.includes(r.candidate_id)).map(r=>({candidate_id:r.candidate_id,expected_revision:r.expected_revision,decision:r.uiDecision,reason_code:r.uiReason,...(r.uiDecision==="include"?{}:{note:r.uiNote||"אושר אנושית לאחר בדיקת ההקשר."})}));if(decisions.some(d=>d.decision==="unresolved")&&!confirm("יש מועמדים מסווגים Unresolved. אם תאשרי אותם Q01 לא תוכל להיסגר. להמשיך בכל זאת?"))return;const button=$("#approve");button.disabled=true;status.className="status muted";text(status,"שומרת human_confirmed…");try{const result=await api("/api/coverage/confirm",{manifest_id:payload.manifest.manifest_key,decisions});status.className="status success";text(status,`נשמרו ${result.applied_count} אישורים · manifest r${result.manifest.manifest_revision}`);$("#humanConfirm").checked=false;await load()}catch(error){status.className="status error";text(status,error.status===409?"ה־manifest השתנה. רענני ונסי שוב.":error.message)}finally{button.disabled=false}});
+    load();
+  </script>
+</body>
+</html>
