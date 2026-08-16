@@ -14,7 +14,8 @@
 - Terms: `https://ballonit.github.io/map-hamikra-oauth/terms.html`
 - Support: `https://ballonit.github.io/map-hamikra-oauth/support.html`
 - Production MCP type: `Universal`
-- Production MCP: `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-public-mcp`
+- Current backend MCP (until Worker deployment): `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-mcp`
+- Final submission MCP: pending verified `https://map-hamikra-mcp.<ACCOUNT_SUBDOMAIN>.workers.dev/mcp` deployment
 - Authentication: none for the public read-only MCP
 - Logo: `assets/logo.svg`
 
@@ -48,18 +49,23 @@ Initial public release of Map HaMikra. Adds read-only biblical corpus research a
 
 - Production MCP `initialize`: PASS.
 - Production MCP `tools/list`: PASS; 13 public read-only tools are exposed.
-- `verse_text` smoke test: PASS.
+- `verse_text` on Deuteronomy 32:8: PASS.
+- `compare_witnesses` on MT/LXX/Vulgate: PASS; witnesses remained separate.
+- `token_sequence_search` exact-adjacency query: PASS; deterministic pagination returned.
+- Invalid reference handling: PASS; returned a bounded tool error.
+- Restricted-source leakage test: PASS; blocked Targum Neofiti returned `SOURCE_UNAVAILABLE` with null text.
 - `dataset_capabilities` MCP `tools/call`: PASS; dynamic research readiness is returned in both text content and structuredContent.
 - Public Website / Privacy / Terms / Support URLs: HTTP 200.
 - Logo asset exists.
 - Public plugin has no login requirement and exposes no Sheet-write tool.
 
-## Current submission blocker — domain verification
+## Current submission blocker — Cloudflare authorization and deployment
 
-OpenAI's current MCP submission flow may require a portal-generated token at `https://<challenge-base-host>/.well-known/openai-apps-challenge`. The current production MCP is hosted on the project-specific Supabase hostname. A live probe of `https://aaszxmakdzorbpkttlon.supabase.co/.well-known/openai-apps-challenge` returns HTTP 404 because hosted Supabase Edge Functions are routed under `/functions/v1/<function>` rather than arbitrary root paths.
+The free Cloudflare Worker source is committed under `cloudflare-worker/`. It now exposes only `/mcp`, local health routes, and the exact OpenAI challenge route; rejects arbitrary paths and non-MCP JSON-RPC bodies; preserves SSE; strips unnecessary infrastructure headers; disables preview URLs; and has dependency-free safety tests.
 
-Do **not** enable paid infrastructure merely to clear this check without explicit approval. Supabase Custom Domains are a paid add-on and were not enabled during this preparation work. A valid solution needs a production MCP hostname (or allowed parent hostname) whose root `/.well-known/openai-apps-challenge` path we control, while preserving the already-tested MCP behavior.
+The final `workers.dev` hostname has not been assigned yet because this environment does not currently have an authenticated Cloudflare connection. Do not run Scan Tools, domain verification, or replace the production MCP field until the Worker is deployed and the full external test matrix passes against the assigned hostname.
 
+No Supabase custom domain, Cloudflare paid plan, paid rate limiting, KV, D1, Durable Objects, Queues, or other paid dependency was enabled.
 ## Portal-only items still required
 
 1. Submitter must have **Apps Management → Write** in the publishing OpenAI organization (organization owners already have it).
