@@ -47,6 +47,14 @@ const missing = await worker.fetch(new Request("https://example.workers.dev/http
 assert(missing.status === 404, "arbitrary paths must be rejected");
 assert(calls.length === 0, "arbitrary paths must not call upstream");
 
+const internalRest = await worker.fetch(new Request("https://example.workers.dev/mcp", {
+  method: "POST",
+  headers: {"content-type": "application/json"},
+  body: JSON.stringify({action: "get_research_witness_passage", reference: "Gen.3.20"}),
+}), env);
+assert(internalRest.status === 400, "non-MCP internal REST actions must be rejected");
+assert(calls.length === 0, "non-MCP internal REST actions must not call upstream");
+
 const request = new Request("https://example.workers.dev/mcp?trace=off", {
   method: "POST",
   headers: {
