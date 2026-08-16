@@ -29,9 +29,11 @@ From this directory, after authorizing Wrangler for the intended Cloudflare acco
 npx wrangler@4.34.0 deploy
 ```
 
-The intended MCP URL is:
+The deployed production MCP URL is:
 
-`https://map-hamikra-mcp.<ACCOUNT_SUBDOMAIN>.workers.dev/mcp`
+`https://map-hamikra-mcp.ballonitforyou.workers.dev/mcp`
+
+Deployment verified on 2026-08-16 against Workers Free. Health, MCP initialize, 13-tool discovery, SSE, representative tool calls, negative routing tests, and publication-gated source behavior passed.
 
 No custom domain, paid Worker feature, paid rate-limiting product, or Supabase custom domain is required by this configuration.
 
@@ -39,6 +41,6 @@ No custom domain, paid Worker feature, paid rate-limiting product, or Supabase c
 
 Do not set a placeholder. After the OpenAI submission portal generates the token, store it as the Worker secret `OPENAI_APPS_CHALLENGE`, deploy, and verify that:
 
-`https://map-hamikra-mcp.<ACCOUNT_SUBDOMAIN>.workers.dev/.well-known/openai-apps-challenge`
+`https://map-hamikra-mcp.ballonitforyou.workers.dev/.well-known/openai-apps-challenge`
 
 returns the exact token while `/mcp` continues to pass the end-to-end MCP tests.
