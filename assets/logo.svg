@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Map HaMikra</title>
+  <desc id="desc">An open book with a map pin, representing biblical text research and mapping.</desc>
+  <rect width="512" height="512" rx="108" fill="#F6F0E5"/>
+  <path d="M96 144c56-18 108-10 160 24v224c-52-34-104-42-160-24V144Z" fill="#FFFFFF" stroke="#173B63" stroke-width="24" stroke-linejoin="round"/>
+  <path d="M416 144c-56-18-108-10-160 24v224c52-34 104-42 160-24V144Z" fill="#FFFFFF" stroke="#173B63" stroke-width="24" stroke-linejoin="round"/>
+  <path d="M256 168v224" stroke="#173B63" stroke-width="20" stroke-linecap="round"/>
+  <path d="M256 116c-50 0-90 40-90 90 0 68 90 154 90 154s90-86 90-154c0-50-40-90-90-90Z" fill="#D96C2F" stroke="#173B63" stroke-width="20" stroke-linejoin="round"/>
+  <circle cx="256" cy="206" r="32" fill="#F6F0E5" stroke="#173B63" stroke-width="16"/>
+</svg>
