@@ -14,8 +14,8 @@
 - Terms: `https://ballonit.github.io/map-hamikra-oauth/terms.html`
 - Support: `https://ballonit.github.io/map-hamikra-oauth/support.html`
 - Production MCP type: `Universal`
-- Current backend MCP (until Worker deployment): `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-mcp`
-- Final submission MCP: pending verified `https://map-hamikra-mcp.<ACCOUNT_SUBDOMAIN>.workers.dev/mcp` deployment
+- Production MCP: `https://map-hamikra-mcp.ballonitforyou.workers.dev/mcp`
+- Upstream backend (not submitted): `https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-mcp`
 - Authentication: none for the public read-only MCP
 - Logo: `assets/logo.svg`
 
@@ -59,11 +59,11 @@ Initial public release of Map HaMikra. Adds read-only biblical corpus research a
 - Logo asset exists.
 - Public plugin has no login requirement and exposes no Sheet-write tool.
 
-## Current submission blocker — Cloudflare authorization and deployment
+## Cloudflare deployment verified — 2026-08-16
 
-The free Cloudflare Worker source is committed under `cloudflare-worker/`. It now exposes only `/mcp`, local health routes, and the exact OpenAI challenge route; rejects arbitrary paths and non-MCP JSON-RPC bodies; preserves SSE; strips unnecessary infrastructure headers; disables preview URLs; and has dependency-free safety tests.
+The free Cloudflare Worker is live at `https://map-hamikra-mcp.ballonitforyou.workers.dev/mcp`. External checks passed for health, MCP initialize, 13-tool discovery, SSE transport, Deuteronomy 32:8 verse retrieval, MT/LXX/Vulgate comparison, exact token-sequence search, invalid-reference handling, and the publication gate for Targum Neofiti. Core result fields matched the upstream MCP; only per-request retrieval timestamps differed as expected.
 
-The final `workers.dev` hostname has not been assigned yet because this environment does not currently have an authenticated Cloudflare connection. Do not run Scan Tools, domain verification, or replace the production MCP field until the Worker is deployed and the full external test matrix passes against the assigned hostname.
+The Worker exposes only `/mcp`, local health routes, and the exact OpenAI challenge route; rejects arbitrary paths and non-MCP JSON-RPC bodies; preserves SSE; strips unnecessary infrastructure headers; and has dependency-free safety tests. The challenge route is intentionally unset and returns `503` until the OpenAI portal supplies the exact verification token.
 
 No Supabase custom domain, Cloudflare paid plan, paid rate limiting, KV, D1, Durable Objects, Queues, or other paid dependency was enabled.
 ## Portal-only items still required
@@ -71,8 +71,8 @@ No Supabase custom domain, Cloudflare paid plan, paid rate limiting, KV, D1, Dur
 1. Submitter must have **Apps Management → Write** in the publishing OpenAI organization (organization owners already have it).
 2. Select a verified developer or business identity matching the public listing.
 3. Create the draft as **With MCP** and choose **Universal** MCP URL.
-4. Use a final production MCP hostname that can pass the portal-generated domain-verification challenge.
-5. Run **Scan Tools** against that final MCP URL and review the 13 discovered tools.
+4. Use `https://map-hamikra-mcp.ballonitforyou.workers.dev/mcp` as the final Universal MCP URL.
+5. Run **Scan Tools** and review the 13 discovered tools, then copy the portal-generated domain-verification token into the Worker secret `OPENAI_APPS_CHALLENGE` and verify the exact challenge response.
 6. Select availability countries/regions.
 7. Review the imported five positive and three negative tests, starter prompts, release notes, and policy attestations, then submit for review.
 
