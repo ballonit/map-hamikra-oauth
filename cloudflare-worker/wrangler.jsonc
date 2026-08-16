@@ -1,0 +1,11 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "map-hamikra-mcp",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-16",
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "UPSTREAM_MCP": "https://aaszxmakdzorbpkttlon.supabase.co/functions/v1/map-hamikra-mcp"
+  }
+}
