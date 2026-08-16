@@ -24,6 +24,10 @@
     "privacyPolicyURL": "https://ballonit.github.io/map-hamikra-oauth/privacy.html",
     "termsOfServiceURL": "https://ballonit.github.io/map-hamikra-oauth/terms.html",
     "supportURL": "https://ballonit.github.io/map-hamikra-oauth/support.html",
+    "logo": "./assets/logo.svg",
+    "composerIcon": "./assets/logo.svg",
+    "brandColor": "#173B63",
+    "brandColorDark": "#D96C2F",
     "defaultPrompt": [
       "הציגי את דברים לב 8 ב-MT/WLC עם מקור ופרובננס.",
       "השווי את דברים לב 8 בין MT, LXX ו-Vulgate ושמרי כל עד בנפרד.",
