@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta name="map-hamikra-oauth-version" content="1.0.1">
+  <meta name="map-hamikra-oauth-version" content="1.1.0">
   <title>מפת המקרא — הרשאה</title>
   <style>
     :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#211e1a;background:#f5f1e9;color-scheme:light}
@@ -56,7 +56,7 @@
     const SUPABASE_URL = "https://aaszxmakdzorbpkttlon.supabase.co";
     const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_HaOwaXTpBkBvjGzIlnRuCQ_OTkn_U7f";
     const OWNER_USER_ID = "45c56d0b-6d1c-45d7-bba0-f197e6003961";
-    const CONTROLLER_RESOURCE = `${SUPABASE_URL}/functions/v1/map-hamikra-research-controller/mcp`;
+    const OAUTH_BACKEND = `${SUPABASE_URL}/functions/v1/map-hamikra-oauth-authorize`;
     const AUDITOR_RESOURCE = `${SUPABASE_URL}/functions/v1/map-hamikra-auditor/mcp`;
     const CHATGPT_CALLBACK = /^https:\/\/chatgpt\.com\/connector\/oauth\/[A-Za-z0-9_-]+$/u;
     const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
@@ -64,35 +64,86 @@
     const message=document.getElementById("message");
     const authorizationId=new URL(location.href).searchParams.get("authorization_id")?.trim()||"";
     let policy=null;
+
     function show(id){for(const name of sections)document.getElementById(name).hidden=name!==id;}
     function notice(text,type="error"){message.textContent=text;message.className=type;message.hidden=false;}
     function clearNotice(){message.hidden=true;message.textContent="";message.className="";}
     function validAuthorizationId(value){return typeof value==="string"&&value.length>=8&&value.length<=2048&&!/[\u0000-\u001f\u007f]/u.test(value);}
     function validResolvedRedirect(actual,base){try{if(!CHATGPT_CALLBACK.test(base))return false;const b=new URL(base),a=new URL(actual);if(a.origin!==b.origin||a.pathname!==b.pathname||a.hash)return false;const allowed=new Set(["code","state","error","error_description","error_uri"]);let hasCode=false,hasError=false;for(const [k,v] of a.searchParams.entries()){if(!allowed.has(k))return false;if(k==="code"&&v)hasCode=true;if(k==="error"&&v)hasError=true;}return hasCode!==hasError;}catch{return false;}}
-    async function validateCurrentUser(){const {data,error}=await supabase.auth.getUser();if(error||!data.user)return false;if(data.user.id!==OWNER_USER_ID){await supabase.auth.signOut({scope:"local"});throw new Error("החשבון המחובר אינו מורשה לפרויקט הזה.");}return true;}
+    function validChatGptRedirect(actual){try{const a=new URL(actual);if(!CHATGPT_CALLBACK.test(`${a.origin}${a.pathname}`)||a.hash)return false;const allowed=new Set(["code","state","error","error_description","error_uri"]);let hasCode=false,hasError=false;for(const [k,v] of a.searchParams.entries()){if(!allowed.has(k))return false;if(k==="code"&&v)hasCode=true;if(k==="error"&&v)hasError=true;}return hasCode!==hasError;}catch{return false;}}
+
+    async function validateCurrentUser(){
+      const {data,error}=await supabase.auth.getUser();
+      if(error||!data.user)return false;
+      if(data.user.id!==OWNER_USER_ID){await supabase.auth.signOut({scope:"local"});throw new Error("החשבון המחובר אינו מורשה לפרויקט הזה.");}
+      return true;
+    }
+
+    async function apiCall(path,body){
+      const {data,error}=await supabase.auth.getSession();
+      if(error||!data.session?.access_token)throw new Error("פג תוקף הכניסה; התחברי שוב.");
+      const response=await fetch(`${OAUTH_BACKEND}${path}`,{
+        method:"POST",
+        headers:{"content-type":"application/json","authorization":`Bearer ${data.session.access_token}`},
+        body:JSON.stringify(body)
+      });
+      let payload=null;
+      try{payload=await response.json();}catch{}
+      if(!response.ok){
+        const code=payload?.error||"OAUTH_BACKEND_FAILED";
+        if(code==="INVALID_SESSION"||code==="AUTH_REQUIRED")throw new Error("פג תוקף הכניסה; התחברי שוב.");
+        if(code==="AUTHORIZATION_NOT_ALLOWED")throw new Error("בקשת ההרשאה אינה תקינה או שפג תוקפה.");
+        if(code==="OWNER_ONLY")throw new Error("החשבון המחובר אינו מורשה לפרויקט הזה.");
+        throw new Error(`לא ניתן להשלים את בקשת ההרשאה (${code}).`);
+      }
+      return payload;
+    }
+
     async function loadAuthorization(){
       clearNotice();
       if(!validAuthorizationId(authorizationId))throw new Error("חסר authorization_id תקין.");
-      const {data:policyData,error:policyError}=await supabase.rpc("rc_validate_oauth_authorization_request",{p_authorization_id:authorizationId});
-      if(policyError||!policyData?.allowed)throw new Error("בקשת ההרשאה אינה תקינה, אינה של ChatGPT, או שפג תוקפה.");
-      if(![CONTROLLER_RESOURCE,AUDITOR_RESOURCE].includes(policyData.resource))throw new Error("הבקשה מיועדת למשאב לא מוכר.");
-      if(!CHATGPT_CALLBACK.test(policyData.redirect_uri||""))throw new Error("כתובת החזרה של ChatGPT אינה מאושרת.");
-      policy=policyData;
-      const {data:details,error}=await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
-      if(error||!details)throw new Error("לא ניתן לקרוא את פרטי בקשת ההרשאה.");
-      if(!("authorization_id" in details)){
-        if(!validResolvedRedirect(details.redirect_url,policy.redirect_uri))throw new Error("בקשת ההרשאה כבר נפתרה אך כתובת החזרה אינה תקינה.");
+      const details=await apiCall("/api/details",{authorization_id:authorizationId});
+      if(details?.resolved){
+        if(!validChatGptRedirect(details.redirect_url))throw new Error("כתובת החזרה שהתקבלה אינה תקינה.");
         location.replace(details.redirect_url);return;
       }
-      const detailsClientId=details.client?.id||details.client?.client_id||details.client_id||"";
-      if(detailsClientId&&detailsClientId!==policy.client_id)throw new Error("מזהה הלקוח אינו תואם לבקשה.");
-      if(details.redirect_uri!==policy.redirect_uri)throw new Error("כתובת החזרה אינה תואמת לבקשה.");
-      document.getElementById("resource-label").textContent=policy.resource===AUDITOR_RESOURCE?"בקר הכיסוי — מפת המקרא":"בקר המחקר — מפת המקרא";
+      if(!details?.authorization_id||!details?.resource||!details?.redirect_uri)throw new Error("פרטי בקשת ההרשאה אינם מלאים.");
+      policy={resource:details.resource,redirect_uri:details.redirect_uri};
+      document.getElementById("resource-label").textContent=details.resource===AUDITOR_RESOURCE?"בקר הכיסוי — מפת המקרא":"בקר המחקר — מפת המקרא";
       show("consent");
     }
-    async function boot(){try{const {data}=await supabase.auth.getSession();if(!data.session){show("login");return;}if(!await validateCurrentUser()){show("login");return;}await loadAuthorization();}catch(error){show("login");notice(error instanceof Error?error.message:"בקשת ההרשאה נכשלה.");}}
-    document.getElementById("login-form").addEventListener("submit",async(event)=>{event.preventDefault();clearNotice();const button=document.getElementById("login-button");button.disabled=true;try{const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;const {data,error}=await supabase.auth.signInWithPassword({email,password});if(error||!data.session)throw new Error("פרטי הכניסה אינם תקינים.");await validateCurrentUser();await loadAuthorization();}catch(error){notice(error instanceof Error?error.message:"הכניסה נכשלה.");}finally{button.disabled=false;}});
-    async function decide(action){clearNotice();const approve=document.getElementById("approve"),deny=document.getElementById("deny");approve.disabled=true;deny.disabled=true;try{await validateCurrentUser();if(!policy)throw new Error("פרטי הבקשה לא נטענו.");const operation=action==="approve"?supabase.auth.oauth.approveAuthorization(authorizationId):supabase.auth.oauth.denyAuthorization(authorizationId);const {data,error}=await operation;if(error||!data?.redirect_url)throw new Error("לא ניתן להשלים את ההרשאה.");if(!validResolvedRedirect(data.redirect_url,policy.redirect_uri))throw new Error("כתובת החזרה שהתקבלה אינה תקינה.");show("finished");location.replace(data.redirect_url);}catch(error){notice(error instanceof Error?error.message:"הפעולה נכשלה.");approve.disabled=false;deny.disabled=false;}}
+
+    async function boot(){
+      try{
+        const {data}=await supabase.auth.getSession();
+        if(!data.session){show("login");return;}
+        if(!await validateCurrentUser()){show("login");return;}
+        await loadAuthorization();
+      }catch(error){show("login");notice(error instanceof Error?error.message:"בקשת ההרשאה נכשלה.");}
+    }
+
+    document.getElementById("login-form").addEventListener("submit",async(event)=>{
+      event.preventDefault();clearNotice();const button=document.getElementById("login-button");button.disabled=true;
+      try{
+        const email=document.getElementById("email").value.trim(),password=document.getElementById("password").value;
+        const {data,error}=await supabase.auth.signInWithPassword({email,password});
+        if(error||!data.session)throw new Error("פרטי הכניסה אינם תקינים.");
+        await validateCurrentUser();await loadAuthorization();
+      }catch(error){notice(error instanceof Error?error.message:"הכניסה נכשלה.");}
+      finally{button.disabled=false;}
+    });
+
+    async function decide(action){
+      clearNotice();const approve=document.getElementById("approve"),deny=document.getElementById("deny");approve.disabled=true;deny.disabled=true;
+      try{
+        await validateCurrentUser();
+        if(!policy)throw new Error("פרטי הבקשה לא נטענו.");
+        const data=await apiCall("/api/decision",{authorization_id:authorizationId,decision:action});
+        if(!data?.redirect_url||!validResolvedRedirect(data.redirect_url,policy.redirect_uri))throw new Error("כתובת החזרה שהתקבלה אינה תקינה.");
+        show("finished");location.replace(data.redirect_url);
+      }catch(error){notice(error instanceof Error?error.message:"הפעולה נכשלה.");approve.disabled=false;deny.disabled=false;}
+    }
+
     document.getElementById("approve").addEventListener("click",()=>decide("approve"));
     document.getElementById("deny").addEventListener("click",()=>decide("deny"));
     boot();
