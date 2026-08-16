@@ -1,0 +1,33 @@
+{
+  "name": "map-hamikra",
+  "version": "1.0.0",
+  "description": "Read-only biblical corpus research tools with provenance-first text retrieval, search, morphology, reference resolution, and separated witness comparison.",
+  "author": {
+    "name": "Ballonit / Mapa HaMikra",
+    "url": "https://ballonit.github.io/map-hamikra-oauth/about.html"
+  },
+  "homepage": "https://ballonit.github.io/map-hamikra-oauth/about.html",
+  "interface": {
+    "displayName": "מפת המקרא",
+    "shortDescription": "חיפוש והשוואת עדי נוסח",
+    "longDescription": "מפת המקרא היא שכבת מחקר וחינוך לקריאה, חיפוש והשוואה של טקסטים מקראיים. היא מספקת טקסט וטוקנים של MT/WLC, חיפוש לקסיקלי ומורפולוגי, חיפוש ביטויים ורצפי טוקנים מדויקים, בדיקת זמינות והשוואה של עדי נוסח ותרגומים, פתרון הבדלי מספור פסוקים ופרובננס מפורט. עדי הנוסח נשמרים בנפרד, מקורות שאינם מורשים לפרסום אינם נחשפים, והמערכת אינה מסיקה Hebrew Vorlage אוטומטית מהבדלי תרגום.",
+    "developerName": "Ballonit / Mapa HaMikra",
+    "category": "Education & Research",
+    "capabilities": [
+      "MT/WLC verse text and OSHB tokens with provenance",
+      "Lemma, morphology, phrase, and exact token-sequence search",
+      "Separated publication-cleared witness comparison",
+      "Cross-versification reference resolution",
+      "Dataset coverage, license, and capability reporting"
+    ],
+    "websiteURL": "https://ballonit.github.io/map-hamikra-oauth/about.html",
+    "privacyPolicyURL": "https://ballonit.github.io/map-hamikra-oauth/privacy.html",
+    "termsOfServiceURL": "https://ballonit.github.io/map-hamikra-oauth/terms.html",
+    "supportURL": "https://ballonit.github.io/map-hamikra-oauth/support.html",
+    "defaultPrompt": [
+      "הציגי את דברים לב 8 ב-MT/WLC עם מקור ופרובננס.",
+      "השווי את דברים לב 8 בין MT, LXX ו-Vulgate ושמרי כל עד בנפרד.",
+      "מצאי במקרא צירופים צמודים של H1121 ואחריו H430 או H410."
+    ]
+  }
+}
