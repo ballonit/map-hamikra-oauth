@@ -3,13 +3,17 @@
   "schema_version": 1,
   "app_info": {
     "display_name": "מפת המקרא",
-    "subtitle": "חיפוש והשוואת עדי נוסח",
-    "description": "מפת המקרא היא כלי מחקר וחינוך לקריאה, חיפוש והשוואה של טקסטים מקראיים. היא מספקת טקסט וטוקנים של MT/WLC, חיפוש לקסיקלי ומורפולוגי, חיפוש ביטויים ומבני טוקנים, בדיקת זמינות והשוואה של עדי נוסח ותרגומים, ו-provenance מפורט תוך הפרדה בין מקורות וללא הסקת Vorlage אוטומטית.",
+    "subtitle": "חיפוש והשוואת שבע מסורות נוסח",
+    "description": "מפת המקרא היא כלי מחקר וחינוך חופשי ולא־מסחרי לקריאה, חיפוש והשוואה של טקסטים מקראיים. היא מספקת טקסט וטוקנים של MT/WLC, חיפוש לקסיקלי ומורפולוגי, חיפוש ביטויים ומבני טוקנים, ובדיקת זמינות והשוואה נפרדת של MT, DSS, LXX, SP, פשיטתא, תרגומים ארמיים ו-Vulgate. לכל תוצאה נשמרים status, מספור מקור, provenance ורישיון; כתבי־יד ותרגומים אינם ממוזגים, ו-model_inference_used=false ללא הסקת Vorlage אוטומטית.",
     "category": "EDUCATION"
   },
   "tools": {
     "verse_text": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Retrieves MT/WLC verse text and optional OSHB token data without modifying stored state.",
         "open_world_justification": "Reads the private corpus database and does not publish or change external internet state.",
@@ -17,7 +21,11 @@
       }
     },
     "lexical_search": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Searches indexed OSHB lemma and surface fields and returns matching corpus records only.",
         "open_world_justification": "Does not send messages, publish content, or change third-party systems.",
@@ -25,7 +33,11 @@
       }
     },
     "morphology_search": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Filters existing OSHB token records by deterministic morphology fields without changing them.",
         "open_world_justification": "Operates only on the corpus database and does not affect public or third-party state.",
@@ -33,7 +45,11 @@
       }
     },
     "phrase_search": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Finds adjacent normalized Hebrew surface sequences in the loaded corpus and returns matches.",
         "open_world_justification": "Reads local corpus data only and does not write to external systems.",
@@ -41,7 +57,11 @@
       }
     },
     "token_sequence_search": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Runs a bounded deterministic token-sequence query over indexed corpus tokens and returns paginated matches.",
         "open_world_justification": "The search is confined to the loaded database and has no external side effects.",
@@ -49,7 +69,11 @@
       }
     },
     "token_analysis": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Retrieves one stored OSHB token and its verse context by stable token identifier.",
         "open_world_justification": "Does not contact or modify third-party systems.",
@@ -57,23 +81,35 @@
       }
     },
     "compare_witnesses": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
-        "read_only_justification": "Reads publication-cleared witness records separately and computes a conservative comparison without storing changes.",
+        "read_only_justification": "Reads witness records cleared for public noncommercial research use and computes a conservative comparison without storing changes.",
         "open_world_justification": "Returns data from loaded sources and does not publish or modify external content.",
         "destructive_justification": "Cannot delete, overwrite, or change witness records."
       }
     },
     "get_witness_passage": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
-        "read_only_justification": "Retrieves a requested publication-cleared witness passage and provenance without changing source data.",
+        "read_only_justification": "Retrieves a requested witness passage cleared for public noncommercial research use, keeping manuscripts and named Targums separate, without changing source data.",
         "open_world_justification": "Reads the loaded witness database only and makes no public or third-party changes.",
         "destructive_justification": "Performs no irreversible action."
       }
     },
     "witness_availability": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Checks loaded coverage and publication status without returning or modifying restricted source text.",
         "open_world_justification": "Does not write to or alter any external service.",
@@ -81,7 +117,11 @@
       }
     },
     "resolve_reference": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Reads verified versification profiles and edition records to resolve reference candidates without changing them.",
         "open_world_justification": "All resolution operates on loaded database records and has no external side effects.",
@@ -89,7 +129,11 @@
       }
     },
     "dataset_capabilities": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Returns corpus coverage, source inventory, licenses, capabilities, and explicit limitations from stored metadata.",
         "open_world_justification": "Only inspects the service's own metadata and does not alter external state.",
@@ -97,7 +141,11 @@
       }
     },
     "search": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Searches references, lemmas, surfaces, or Hebrew phrases and returns stable fetch identifiers.",
         "open_world_justification": "Search is limited to the loaded corpus and does not affect third-party systems.",
@@ -105,7 +153,11 @@
       }
     },
     "fetch": {
-      "annotations": {"readOnlyHint": true, "openWorldHint": false, "destructiveHint": false},
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
       "justifications": {
         "read_only_justification": "Fetches a corpus record identified by a stable search result, token, or witness identifier.",
         "open_world_justification": "Reads stored corpus data and does not publish or change external state.",
@@ -119,7 +171,7 @@
       "user_prompt": "הציגי את דברים לב 8 בנוסח MT/WLC וצייני את מקור הטקסט.",
       "file_attachment_urls": null,
       "tools_triggered": "verse_text",
-      "expected_output": "Returns Deuteronomy 32:8 from MT/WLC with the requested reading and provenance for OSHB/WLC.",
+      "expected_output": "Returns Deuteronomy 32:8 from MT/WLC with the requested reading, OSHB/WLC provenance, license metadata, and model_inference_used=false.",
       "expected_output_url": null
     },
     {
@@ -139,19 +191,19 @@
       "expected_output_url": null
     },
     {
-      "description": "Compare publication-cleared witnesses without merging them.",
-      "user_prompt": "השווי את דברים לב 8 בין MT, LXX ו-Vulgate ושמרי כל עד בנפרד.",
+      "description": "Compare all loaded witness families without merging them.",
+      "user_prompt": "השווי את דברים לב 8–9 בין MT, DSS, LXX, SP, פשיטתא, תרגומים ארמיים ו-Vulgate. הציגי כל כתב־יד וכל תרגום ארמי בנפרד.",
       "file_attachment_urls": null,
       "tools_triggered": "compare_witnesses",
-      "expected_output": "Returns the three witnesses separately with source editions, provenance, mapping status, and a conservative comparison that does not infer a Hebrew Vorlage automatically.",
+      "expected_output": "Returns every requested witness separately with explicit status, source-native text when available, manuscript or named Targum identity, reference mapping, provenance, license, and model_inference_used=false. It must not infer a Hebrew Vorlage automatically.",
       "expected_output_url": null
     },
     {
-      "description": "Retrieve a named Targum passage as a separate witness.",
-      "user_prompt": "הציגי את אונקלוס לבראשית ג 20 עם מקור ומהדורה.",
+      "description": "Keep multiple named Targums separate for one passage.",
+      "user_prompt": "הציגי את התרגומים הארמיים הזמינים לבראשית יד 22, כל תרגום בנפרד, עם status, מקור ומהדורה.",
       "file_attachment_urls": null,
       "tools_triggered": "get_witness_passage",
-      "expected_output": "Returns the named Onkelos witness when available, with source-native text, coverage status, edition information, and provenance without merging other Targums.",
+      "expected_output": "Returns each available named Targum as its own witness record and reports unavailable named corpora as SOURCE_UNAVAILABLE rather than merging them or inventing text.",
       "expected_output_url": null
     }
   ],
